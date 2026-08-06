@@ -67,6 +67,7 @@ def login():
 
 		if stored_hash is None:
 			print("No password set for this user or file might be damaged.")
+			input("\nPress enter to return...")
 			return None
 		elif stored_hash == hashed_password:
 			user = {

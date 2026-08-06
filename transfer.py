@@ -16,7 +16,8 @@ def user_transfer(user):
         try:
             user_selection = int(input("\nSelect account to transfer FROM: "))
         except ValueError:
-            print("Invalid input. Please enter a number corresponding to the menu options.")    
+            print("Invalid input. Please enter a number corresponding to the menu options.")
+            input("\nPress Enter to continue...")   
             continue
                     
         if user_selection == 1:
@@ -27,7 +28,7 @@ def user_transfer(user):
             return # Go back to dashboard
         else:
             print("\nInvalid selection, please try again")
-            print("\nPress Enter to continue...")
+            input("\nPress Enter to continue...")
             continue
         
         while True:
@@ -40,7 +41,7 @@ def user_transfer(user):
                 user_selection = int(input("\nSelect account to transfer TO: "))
             except ValueError:
                 print("Invalid input. Please enter a number corresponding to the menu options.")    
-                print("\nPress Enter to continue...")
+                input("\nPress Enter to continue...")
                 continue
             
             if user_selection == 1:
@@ -51,12 +52,12 @@ def user_transfer(user):
                 break # Go back to FROM account selection
             else:
                 print("\nInvalid selection, please try again")
-                print("\nPress Enter to continue...")
+                input("\nPress Enter to continue...")
                 continue
             
             if from_account == to_account:
                 print("Unable to transfer to the same account. Please select a different account!")
-                print("\nPress Enter to continue...")
+                input("\nPress Enter to continue...")
                 continue
             
             break # Exits the inner loop if valid accounts are selected
@@ -73,10 +74,12 @@ def user_transfer(user):
                 transfer_amount = float(input(f"Enter the amount to transfer from {from_account} to {to_account}: $"))
             except ValueError:
                 print("\nInvalid Input. Please enter a valid number for the transfer amount")
+                input("\nPress enter to try again...")
                 continue
             
             if transfer_amount <= 0:
                 print("\nTransfer amount must be greater than $0. Please try again")
+                input("\nPress enter to try again...")
                 continue
             
             from_balance_key = f"{from_account}Balance"
@@ -84,10 +87,12 @@ def user_transfer(user):
             
             if transfer_amount > user[from_balance_key]:
                 print(f"Insufficient funds in {from_account}")
+                input("\nPress enter to try again...")
                 continue
             
             elif transfer_amount > 10000:
                 print("Transfer amount exceeds the maximum limit of $10,000. Please enter a smaller amount")
+                input("\nPress enter to try again...")
                 continue
 
             # Perform the transfer

@@ -54,31 +54,43 @@ def register():
 				
 		if username_found:
 			print("Username already exists")
+			input("\nPress enter to try again...")
 		else:
 			break
 
 	#Collects password and checks if Password already exists
 	while True:
 		utils.clear_screen()
-		password = pwinput.pwinput("Enter your Password: " , mask = "*")
+		print("================================")
+		print("       PASSWORD CREATION")
+		print("================================")
+		print("\nPassword Requirements:")
+		print("Password must be at least 8 characters long. \nIt must contain at least one uppercase letter, \none lowercase letter, one number, and one special character.")
+		password = pwinput.pwinput("\nEnter your Password: " , mask = "*")
 		
 		if len(password) < 8:                                   #Checks character count
 			print("Must be at least 8 characters")
+			input("\nPress enter to try again...")
 			continue
 		if not re.search(r"[A-Z]", password):                   #Checks for uppercase letter
 			print("Must contain an uppercase letter")
+			input("\nPress enter to try again...")
 			continue
 		if not re.search(r"[a-z]", password):                   #Checks for lowercase letter
 			print("Must contain a lowercase letter")
+			input("\nPress enter to try again...")
 			continue
 		if not re.search(r"\d", password):                      #Checks for a digit
 			print("Must contain a number")
+			input("\nPress enter to try again...")
 			continue
 		if not re.search(r"[!@#$%^&*()_+=-]", password):        #Checks for a special character
 			print("Must contain a special character")
+			input("\nPress enter to try again...")
 			continue
 		if " " in password:                                     #Checks for spaces in the password
 			print("Password cannot contain spaces!")
+			input("\nPress enter to try again...")
 			continue
 		
 		confirm = pwinput.pwinput("Enter Password Again: " ,  mask = "*")
@@ -118,4 +130,5 @@ def register():
 	print(f"Welcome, {fname}!\n")
 	print(f"Your User ID is: {userid}\n")
 	print("You may now log in with your username and password.")
-	print("================================")  
+	print("================================")
+	input("\nPress enter to return to the main menu...")

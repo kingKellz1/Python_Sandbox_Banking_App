@@ -10,15 +10,21 @@ def user_deposit(user):
 		return
 		
 	while True:
+		utils.clear_screen()
+		amount = input("Enter deposit amount (or B to go back): $").strip()
+		if amount.lower() == 'b':
+			return
+
 		try:
-			utils.clear_screen()
-			deposit_amount = float(input("Enter deposit amount: $"))
+			deposit_amount = float(amount)
 		except ValueError:
 			print("\nEnter a valid amount")
+			input("\nPress enter to try again...")
 			continue
 		
 		if deposit_amount <= 0:
 			print("\nDeposit must be greater than $0")
+			input("\nPress enter to try again...")
 			continue
 	
 		balance_key = utils.get_balance_key(account)
@@ -59,22 +65,32 @@ def user_withdrawal(user):
 		return
 		
 	balance_key = utils.get_balance_key(account)
+	if user[balance_key] <= 0:
+		print(f"\nInsufficient funds in {account} account")
+		input("\nPress enter to return...")
+		return
  
 	while True:
 		utils.clear_screen()
+		amount = input("Enter Withdrawal amount (or B to go back): $").strip()
+		if amount.lower() == 'b':
+			return
   
 		try:
-			withdrawal_amount = float(input("Enter withdrawal amount: $"))
+			withdrawal_amount = float(amount)
 		except ValueError:
 			print("\nEnter a valid amount")
+			input("\nPress enter to try again...")
 			continue
 		
 		if withdrawal_amount <= 0:
 			print("\nWithdrawal must be greater than $0")
+			input("\nPress enter to try again...")
 			continue
 
 		if withdrawal_amount > user[balance_key]:
 			print(f"\nInsufficient funds in {account} account")
+			input("\nPress enter to try again...")
 			continue
 	
 		user[balance_key] -= withdrawal_amount
