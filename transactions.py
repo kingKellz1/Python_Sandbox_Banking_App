@@ -34,20 +34,13 @@ def user_deposit(user):
 			
 		transaction_id = storage.get_transaction_id(user)
 		
-		dtime = datetime.datetime.now()
-		date = dtime.strftime("%Y-%m-%d")
-		time = dtime.strftime("%H:%M:%S")
+		transaction = storage.create_transaction_base(transaction_id)
 		
-		transaction = {
-			"Transaction ID": transaction_id,
-			"Date": date,
-			"Time": time,
-			"Description": f"Deposit to {account} account",
-			"Account Selected": account,
-			"Transaction Type": "Deposit",
-			"Amount": deposit_amount,
-			"Balance": current_balance
-		}
+		transaction["Description"] = f"Deposit to {account} account"
+		transaction["Account Selected"] = account
+		transaction["Transaction Type"] = "Deposit"
+		transaction["Amount"] = deposit_amount
+		transaction["Balance"] = current_balance
 		
 		storage.save_transaction(transaction, user)
 		storage.save_profile(user)
@@ -97,21 +90,14 @@ def user_withdrawal(user):
 		current_balance = user[balance_key]
 			
 		transaction_id = storage.get_transaction_id(user)
-		
-		dtime = datetime.datetime.now()
-		date = dtime.strftime("%Y-%m-%d")
-		time = dtime.strftime("%H:%M:%S")
-		
-		transaction = {
-			"Transaction ID": transaction_id,
-			"Date": date,
-			"Time": time,
-			"Description": f"Withdrawal from {account} account",
-			"Account Selected": account,
-			"Transaction Type": "Withdrawal",
-			"Amount": withdrawal_amount,
-			"Balance": current_balance
-		}
+
+		transaction = storage.create_transaction_base(transaction_id)
+
+		transaction["Description"] = f"Withdrawal from {account} account"
+		transaction["Account Selected"] = account
+		transaction["Transaction Type"] = "Withdrawal"
+		transaction["Amount"] = withdrawal_amount
+		transaction["Balance"] = current_balance
 		
 		storage.save_transaction(transaction, user)
 		storage.save_profile(user)

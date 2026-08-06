@@ -44,3 +44,17 @@ def get_transaction_id(user):
 			file.write(str(transaction_number))
 		transaction_id = f'{transaction_number:06d}'
 		return transaction_id
+
+def create_transaction_base(transaction_id):
+	"""Create the base transaction dictionary."""
+	current_datetime = datetime.datetime.now()
+ 
+	transaction_date = current_datetime.strftime("%Y-%m-%d")
+	transaction_time = current_datetime.strftime("%H:%M:%S")
+ 
+	transaction = {
+		"Transaction ID": transaction_id,
+		"Date": transaction_date,
+		"Time": transaction_time
+	}
+	return transaction

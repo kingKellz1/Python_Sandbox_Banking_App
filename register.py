@@ -15,12 +15,14 @@ def register():
 		if fname:
 			break
 		print("First name cannot be blank.")
+		input("\nPress enter to try again...")
 	while True:
 		utils.clear_screen()
 		lname = input("Enter last name: ").capitalize()
 		if lname:
 			break
 		print("Last name cannot be blank.")
+		input("\nPress enter to try again...")
 	while True:
 		utils.clear_screen()
 		email = input("Enter email: ").strip()
@@ -34,6 +36,7 @@ def register():
 		):
 			break
 		print("Invalid email address. Please try again")
+		input("\nPress enter to try again...")
 	while True:
 		utils.clear_screen()
 		username = input("Enter username : ").strip().lower()
@@ -97,6 +100,7 @@ def register():
 		
 		if password != confirm:
 			print("Passwords do not match! Please try again!")
+			input("\nPress enter to try again...")
 			continue
 		break
 

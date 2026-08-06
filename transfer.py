@@ -1,5 +1,4 @@
 import storage
-import datetime
 import utils
 
 def user_transfer(user):
@@ -82,8 +81,8 @@ def user_transfer(user):
                 input("\nPress enter to try again...")
                 continue
             
-            from_balance_key = f"{from_account}Balance"
-            to_balance_key = f"{to_account}Balance"
+            from_balance_key = utils.get_balance_key(from_account)
+            to_balance_key = utils.get_balance_key(to_account)
             
             if transfer_amount > user[from_balance_key]:
                 print(f"Insufficient funds in {from_account}")
@@ -101,22 +100,15 @@ def user_transfer(user):
             
             transaction_id = storage.get_transaction_id(user)
             
-            dtime = datetime.datetime.now()
-            date = dtime.strftime("%Y-%m-%d")
-            time = dtime.strftime("%H:%M:%S")
+            transaction = storage.create_transaction_base(transaction_id)
             
-            transaction = {
-                "TransactionID": transaction_id,
-                "Date": date,
-                "Time": time,
-                "Description": f"Transfer from {from_account} to {to_account}",
-                "TransactionType": "Transfer",
-                "From": from_account,
-                "To": to_account,
-                "Amount": transfer_amount,
-                "FromBalance": user[from_balance_key],
-                "ToBalance": user[to_balance_key]
-            }
+            transaction["Description"] = f"Transfer from {from_account} to {to_account}"
+            transaction["Transaction Type"] = "Transfer"
+            transaction["From"] = from_account
+            transaction["To"] = to_account
+            transaction["Amount"] = transfer_amount
+            transaction["FromBalance"] = user[from_balance_key]
+            transaction["ToBalance"] = user[to_balance_key]
             
             storage.save_transaction(transaction, user)
             storage.save_profile(user)
