@@ -23,7 +23,8 @@ def dashboard(user):
         try:
             user_selection = int(input("What would you like to do: "))
         except ValueError:
-                print("Invalid input. Please enter a number corresponding to the menu options.")    
+                print("Invalid input. Please enter a number corresponding to the menu options.")
+                input("\nPress enter to continue...")    
                 continue
         if user_selection == 1:
             utils.clear_screen()
@@ -56,3 +57,4 @@ def dashboard(user):
             break
         else:
             print("Invalid selection, please try again")
+            input("\nPress enter to return to the dashboard...")

@@ -25,6 +25,7 @@ def display_transaction_dates(user):
     dates = get_transaction_dates(user)
     if not dates:
         print("\nNo transaction history available.")
+        input("\nPress Enter to return...")
         return
     while True:
         utils.clear_screen()
@@ -68,6 +69,7 @@ def view_transactions(user, transaction_date):
     
     if not os.path.exists(transaction_file):
         print("\nNo transaction history available")
+        input("\nPress Enter to return to the transaction history menu...")
         return
     
     utils.clear_screen()
@@ -76,6 +78,7 @@ def view_transactions(user, transaction_date):
         transactions = file.readlines()
         if not transactions:
             print("No transactions recorded")
+            input("\nPress Enter to return to the transaction history menu...")
             return
         for transaction in transactions:
             print(transaction.strip())

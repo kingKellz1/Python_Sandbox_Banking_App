@@ -114,7 +114,7 @@ def user_transfer(user):
             storage.save_profile(user)
             
             utils.clear_screen()
-            print(f"\nTransfer Successful!")
+            print("\nTransfer Successful!")
             print("================================")
             print(f"Type:       Transfer")
             print(f"From:       {from_account}")
