@@ -2,6 +2,7 @@ import utils
 import login
 import register
 import dashboard
+import pwinput
 
 while True:
     utils.clear_screen()
@@ -17,10 +18,15 @@ while True:
         continue
     if menu_selection == 1:
         utils.clear_screen()
-        user = login.login()
-        if user:
+        username = input("Enter Username: ").strip()
+        password = pwinput.pwinput("Enter Password: ", mask="*")
+        success, result = login.login(username, password)
+        if success:
             utils.clear_screen()
-            dashboard.dashboard(user)
+            dashboard.dashboard(result)
+        else:
+            print(result)
+            input("\nPress enter to continue...")
     elif menu_selection == 2:
         utils.clear_screen()
         register.register()

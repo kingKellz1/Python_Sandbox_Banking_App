@@ -1,10 +1,11 @@
 import os
 import hashlib
-import pwinput
 
-def login():
+def login(username, password):
 	"""Function to handle user login."""
-	username = input("Username : ").lower()
+	username = username.lower()  # Normalize username to lowercase for case-insensitive comparison
+	base_dir = os.path.dirname(__file__)
+	users_dir = os.path.join(base_dir, "users")
 	username_found = False
 	matching_file = None
 	stored_hash = None
@@ -13,13 +14,13 @@ def login():
 	checking_balance = None
 	savings_balance = None
 	
-	for filename in os.listdir("users"):
+	for filename in os.listdir(users_dir):
 		# Skips hidden files like .DS_Store
 		if filename.startswith("."):
 			continue
 
 		# Specify utf-8 encoding and ignore unreadable bytes
-		with open(f"users/{filename}", "r", encoding = "utf-8", errors = "ignore") as file:
+		with open(os.path.join(users_dir, filename), "r", encoding = "utf-8", errors = "ignore") as file:
 			found_in_this_file = False
 			temp_hash = None
 			temp_fname = None
@@ -58,17 +59,13 @@ def login():
 				break  # Stops checking the remaining files
 
 	if not username_found:
-		print("Username not found")
-		return None
+		return False, "Username not found"
 	else:
 		#print(f"Username found in {matching_file}")
-		password = pwinput.pwinput("Enter your Password: " , mask = "*")
 		hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
 		if stored_hash is None:
-			print("No password set for this user or file might be damaged.")
-			input("\nPress enter to return...")
-			return None
+			return False, "No password set for this user or file might be damaged."
 		elif stored_hash == hashed_password:
 			user = {
 				"UserID": userid,
@@ -81,7 +78,6 @@ def login():
 				"SavingsBalance": savings_balance,
 				"ProfileFile": matching_file
 				}
-			return user
+			return True, user
 		else:
-			print("Incorrect password")
-			return None
+			return False, "Incorrect Password"
