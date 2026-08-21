@@ -1,9 +1,88 @@
 import customtkinter
+from .. import transactions
 
 def go_back(account_frame, dashboard_frame):
     account_frame.grid_remove()
     dashboard_frame.grid()
     dashboard_frame.update_idletasks()
+    
+def show_deposit(app, user, dashboard_frame, checking_balance, savings_balance):
+    dashboard_frame.grid_remove()
+    user_selection = None
+    
+    def select_account(account):
+        nonlocal user_selection
+        user_selection = account
+        
+        result_label.configure(text="")
+        
+        if account == "Checking":
+            checking_button.configure(fg_color="green")
+            savings_button.configure(fg_color="gray")
+        else:
+            checking_button.configure(fg_color="gray")
+            savings_button.configure(fg_color="green")
+        
+        amount_frame.grid()
+    
+    def make_deposit():
+        amount = amount_entry.get()
+        try:
+            amount = float(amount)
+        except ValueError:
+            result_label.configure(text="Please enter a valid amount")
+            return
+        
+        success, result = transactions.deposit(user, user_selection, amount)
+        
+        if success:
+            result_label.configure(text=f"Deposit successfull!\nNew balance: ${result:,.2f}")
+            amount_entry.delete(0, "end")
+            
+            if user_selection == "Checking":
+                checking_balance.configure(text=f"${result:,.2f}")
+            else:
+                savings_balance.configure(text=f"${result:,.2f}")
+        else:
+            result_label.configure(text=result)
+    
+    deposit_frame = customtkinter.CTkFrame(app)
+    deposit_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    
+    deposit_frame.grid_columnconfigure(0, weight=1)
+    deposit_frame.grid_columnconfigure(1, weight=1)
+    
+    title = customtkinter.CTkLabel(deposit_frame, text="MAKE A DEPOSIT", font=("Arial", 24, "bold"))
+    title.grid(row=0, column=0, columnspan=2, pady=20)
+    
+    account_label = customtkinter.CTkLabel(deposit_frame, text="SELECT ACCOUNT", font=("Arial", 16, "bold"))
+    account_label.grid(row=1, column=0, columnspan=2, pady=(20, 10))
+    
+    checking_button = customtkinter.CTkButton(deposit_frame, text="[ CHECKING ]", command=lambda: select_account("Checking"))
+    checking_button.grid(row=2, column=0, padx=10, pady=10)
+    
+    savings_button = customtkinter.CTkButton(deposit_frame, text="[ SAVINGS ]", command=lambda: select_account("Savings"))
+    savings_button.grid(row=2, column=1, padx=10, pady=10)
+    
+    amount_frame = customtkinter.CTkFrame(deposit_frame)
+    amount_frame.grid(row=4, column=0, columnspan=2, pady=10)
+    
+    amount_label = customtkinter.CTkLabel(amount_frame, text="AMOUNT")
+    amount_label.grid(row=0, column=0, padx=10, pady=10)
+    
+    amount_entry = customtkinter.CTkEntry(amount_frame, width=200)
+    amount_entry.grid(row=0, column=1, padx=10, pady=10)
+    
+    amount_frame.grid_remove()
+    
+    deposit_button = customtkinter.CTkButton(amount_frame, text="[ DEPOSIT ]", command=make_deposit)
+    deposit_button.grid(row=0, column=2, padx=10, pady=10)
+    
+    result_label = customtkinter.CTkLabel(deposit_frame, text="")
+    result_label.grid(row=5, column=0, columnspan=2, pady=5)
+    
+    back_button = customtkinter.CTkButton(deposit_frame, text="[BACK TO DASHBOARD]", command=lambda: go_back(deposit_frame, dashboard_frame))
+    back_button.grid(row=6, column=0, columnspan=2, pady=20)
 
 def view_account(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
@@ -110,7 +189,7 @@ def show_dashboard(app, user):
     view_account_button = customtkinter.CTkButton(actions_frame, text="[VIEW ACCOUNT]", command=lambda: view_account(app, user, dashboard_frame))
     view_account_button.grid(row=0, column=0, padx=10, pady=10)
     
-    deposit_button = customtkinter.CTkButton(actions_frame, text="[DEPOSIT]")
+    deposit_button = customtkinter.CTkButton(actions_frame, text="[DEPOSIT]", command=lambda: show_deposit(app, user, dashboard_frame, checking_balance, savings_balance))
     deposit_button.grid(row=0, column=1, padx=10, pady=10)
     
     withdraw_button = customtkinter.CTkButton(actions_frame, text="[WITHDRAW]")

@@ -1,6 +1,26 @@
-import storage
+from . import storage
 import datetime
-import utils
+from . import utils
+
+def deposit(user, account, amount):
+    if amount <= 0:
+        return False, "Deposit must be greater than $0"
+    balance_key = utils.get_balance_key(account)
+    user[balance_key] += amount
+    current_balance = user[balance_key]
+    transaction_id = storage.get_transaction_id(user)
+    transaction = storage.create_transaction_base(transaction_id)
+    
+    transaction["Description"] = f"Deposit to {account} account"
+    transaction["Account Selected"] = account
+    transaction["Transaction Type"] = "Deposit"
+    transaction["Amount"] = amount
+    transaction["Balance"] = current_balance
+    
+    storage.save_transaction(transaction, user)
+    storage.save_profile(user)
+    
+    return True, current_balance
 
 def user_deposit(user):
 	"""Function to handle deposits into the user's account."""

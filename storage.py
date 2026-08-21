@@ -1,11 +1,14 @@
 import os
 import datetime
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+USERS_DIR = os.path.join(BASE_DIR, "users")
+TRANSACTIONS_DIR = os.path.join(BASE_DIR, "transactions")
 TRANSACTION_SEPARATOR = "=" * 60
 
 def save_profile(user):
 	"""Save user profile data to a profile file."""
-	filepath = f"users/{user['ProfileFile']}"
+	filepath = os.path.join(USERS_DIR, user["ProfileFile"])
 	with open (filepath, "w", encoding = "utf-8") as file:            
 		for key, value in user.items():
 			if key == "ProfileFile":
@@ -14,11 +17,12 @@ def save_profile(user):
 
 def save_transaction(transaction, user):
 	"""Append a transaction record for a user to the daily transaction file."""
-	os.makedirs(f"transactions/{user['UserID']}", exist_ok=True)
+	user_transactions_dir = os.path.join(TRANSACTIONS_DIR, user["UserID"])
+	os.makedirs(user_transactions_dir, exist_ok=True)
 				
 	today = datetime.datetime.now().strftime("%Y-%m-%d")
 	
-	filepath = f"transactions/{user['UserID']}/{today}.txt"
+	filepath = os.path.join(user_transactions_dir,f"{today}.txt")
 	with open (filepath, "a", encoding = "utf-8") as file:
 		for key, value in transaction.items():
 			file.write(f"{key:20}: {value}\n")
@@ -26,9 +30,10 @@ def save_transaction(transaction, user):
 			
 def get_transaction_id(user):
 	"""Generate and return the next transaction ID for a user."""
-	os.makedirs(f"transactions/{user['UserID']}", exist_ok=True)
+	user_transactions_dir = os.path.join(TRANSACTIONS_DIR, user["UserID"])
+	os.makedirs(user_transactions_dir, exist_ok=True)
 	
-	filepath = f"transactions/{user['UserID']}/counter.txt"
+	filepath = os.path.join(user_transactions_dir, "counter.txt")
 	if not os.path.exists(filepath):
 		transaction_number = 1
 		with open (filepath, "w", encoding = "utf-8") as file:
