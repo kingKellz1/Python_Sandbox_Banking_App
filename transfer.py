@@ -1,5 +1,45 @@
-import storage
-import utils
+from . import storage
+from . import utils
+
+def transfer(user, from_account, to_account, amount):
+    if amount <= 0:
+        return False, "Transfer amount must be greater than $0"
+    if from_account == to_account:
+        return False, "Unable to transfer to the same account"
+    
+    from_balance_key = utils.get_balance_key(from_account)
+    to_balance_key = utils.get_balance_key(to_account)
+    
+    if amount > user[from_balance_key]:
+        return False, f"Insufficient funds in {from_account}"
+    
+    if amount > 10000:
+        return False, "Transfer amount exceeds the maximum limit of $10,000"
+    
+    user[from_balance_key] -= amount
+    user[to_balance_key] += amount
+    
+    from_balance = user[from_balance_key]
+    to_balance = user[to_balance_key]
+    
+    transaction_id = storage.get_transaction_id(user)
+    transaction = storage.create_transaction_base(transaction_id)
+    
+    transaction["Description"] = f"Transfer from {from_account} to {to_account}"
+    transaction["Transaction Type"] = "Transfer"
+    transaction["From"] = from_account
+    transaction["To"] = to_account
+    transaction["Amount"] = amount
+    transaction["FromBalance"] = from_balance
+    transaction["ToBalance"] = to_balance
+    
+    storage.save_transaction(transaction, user)
+    storage.save_profile(user)
+    
+    return True, {
+        "FromBalance": from_balance,
+        "ToBalance": to_balance
+    }
 
 def user_transfer(user):
     """Function to handle transfers between the user's account."""

@@ -1,5 +1,6 @@
 import customtkinter
 from .. import transactions
+from .. import transfer
 
 def go_back(account_frame, dashboard_frame):
     account_frame.grid_remove()
@@ -162,6 +163,129 @@ def show_withdraw(app, user, dashboard_frame, checking_balance, savings_balance)
     back_button = customtkinter.CTkButton(withdraw_frame, text="[BACK TO DASHBOARD]", command=lambda: go_back(withdraw_frame, dashboard_frame))
     back_button.grid(row=6, column=0, columnspan=2, pady=20)
 
+def show_transfer(app, user, dashboard_frame, checking_balance, savings_balance):
+    dashboard_frame.grid_remove()
+    from_account = None
+    to_account = None
+    def select_from(account):
+        nonlocal from_account, to_account
+        from_account = account
+        to_account = None
+        
+        amount_frame.grid_remove()
+        
+        to_checking_button.configure(fg_color="gray")
+        to_savings_button.configure(fg_color="gray")
+        
+        if account == "Checking":
+            from_checking_button.configure(fg_color="green")
+            from_savings_button.configure(fg_color="gray")
+        else:
+            from_checking_button.configure(fg_color="gray")
+            from_savings_button.configure(fg_color="green")
+        
+        if account == "Checking":
+            to_checking_button.configure(state="disabled")
+            to_savings_button.configure(state="normal")
+        else:
+            to_checking_button.configure(state="normal")
+            to_savings_button.configure(state="disabled")
+        
+        to_frame.grid()
+        
+        result_label.configure(text="")
+        
+    def select_to(account):
+        nonlocal to_account
+        to_account = account
+        
+        if account == "Checking":
+            to_checking_button.configure(fg_color="green")
+            to_savings_button.configure(fg_color="gray")
+        else:
+            to_checking_button.configure(fg_color="gray")
+            to_savings_button.configure(fg_color="green")
+            
+        amount_frame.grid()
+        
+        result_label.configure(text="")
+        
+    def make_transfer():
+        amount = amount_entry.get()
+        
+        try:
+            amount = float(amount)
+        except ValueError:
+            result_label.configure(text="Please enter a valid amount.")
+            return
+        
+        success, result = transfer.transfer(user, from_account, to_account, amount)
+        
+        if success:
+            result_label.configure(text=(f"Transfer successful!\n"f"{from_account} Balance: ${result['FromBalance']:,.2f}\n"f"{to_account} Balance: ${result['ToBalance']:,.2f}"))
+            amount_entry.delete(0, "end")
+            
+            if from_account == "Checking":
+                checking_balance.configure(text=f"${result['FromBalance']:,.2f}")
+                savings_balance.configure(text=f"${result['ToBalance']:,.2f}")
+            else:
+                savings_balance.configure(text=f"${result['FromBalance']:,.2f}")
+                checking_balance.configure(text=f"${result['ToBalance']:,.2f}")
+        else:
+            result_label.configure(text=result)
+    
+    transfer_frame = customtkinter.CTkFrame(app)
+    transfer_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    
+    transfer_frame.grid_columnconfigure(0, weight=1)
+    transfer_frame.grid_columnconfigure(1, weight=1)
+    
+    title = customtkinter.CTkLabel(transfer_frame, text="TRANSFER FUNDS", font=("Arial", 24, "bold"))
+    title.grid(row=0, column=0, columnspan=2, pady=20)
+    
+    from_label = customtkinter.CTkLabel(transfer_frame, text="SELECT FROM ACCOUNT", font=("Arial", 16, "bold"))
+    from_label.grid(row=1, column=0, columnspan=2, pady=(20, 10))
+    
+    from_checking_button = customtkinter.CTkButton(transfer_frame, text="[ CHECKING ]", command=lambda: select_from("Checking"))
+    from_checking_button.grid(row=2, column=0, padx=10, pady=10)
+    
+    from_savings_button = customtkinter.CTkButton(transfer_frame, text="[ SAVINGS ]", command=lambda: select_from("Savings"))
+    from_savings_button.grid(row=2, column=1, padx=10, pady=10)
+    
+    to_frame = customtkinter.CTkFrame(transfer_frame)
+    to_frame.grid(row=3, column=0, columnspan=2, pady=10)
+    
+    to_label = customtkinter.CTkLabel(to_frame, text="SELECT TO ACCOUNT", font=("Arial", 16, "bold"))
+    to_label.grid(row=0, column=0, columnspan=2, pady=(10, 5))
+    
+    to_checking_button = customtkinter.CTkButton(to_frame, text="[ CHECKING ]", command=lambda: select_to("Checking"))
+    to_checking_button.grid(row=1, column=0, padx=10, pady=10)
+    
+    to_savings_button = customtkinter.CTkButton(to_frame, text="[ SAVINGS ]", command=lambda: select_to("Savings"))
+    to_savings_button.grid(row=1, column=1, padx=10, pady=10)
+    
+    to_frame.grid_remove()
+    
+    amount_frame = customtkinter.CTkFrame(transfer_frame)
+    amount_frame.grid(row=4, column=0, columnspan=2, pady=10)
+    
+    amount_label = customtkinter.CTkLabel(amount_frame, text="AMOUNT")
+    amount_label.grid(row=0, column=0, padx=10, pady=10)
+    
+    amount_entry=customtkinter.CTkEntry(amount_frame, width=200)
+    amount_entry.grid(row=0, column=1, padx=10, pady=10)
+    
+    transfer_action_button = customtkinter.CTkButton(amount_frame, text="[ TRANSFER ]", command=make_transfer)
+    transfer_action_button.grid(row=0, column=2, padx=10, pady=10)
+    
+    amount_frame.grid_remove()
+    
+    result_label = customtkinter.CTkLabel(transfer_frame, text="")
+    result_label.grid(row=5, column=0, columnspan=2, pady=5)
+    
+    back_button = customtkinter.CTkButton(transfer_frame, text="[ BACK TO DASHBOARD ]", command=lambda: go_back(transfer_frame, dashboard_frame))
+    back_button.grid(row=6, column=0, columnspan=2, pady=20)
+
 def view_account(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
     account_frame = customtkinter.CTkFrame(app)
@@ -273,7 +397,7 @@ def show_dashboard(app, user):
     withdraw_button = customtkinter.CTkButton(actions_frame, text="[WITHDRAW]", command=lambda: show_withdraw(app, user, dashboard_frame, checking_balance, savings_balance))
     withdraw_button.grid(row=0, column=2, padx=10, pady=10)
     
-    transfer_button = customtkinter.CTkButton(actions_frame, text="[TRANSFER]")
+    transfer_button = customtkinter.CTkButton(actions_frame, text="[TRANSFER]", command=lambda: show_transfer(app, user, dashboard_frame, checking_balance, savings_balance))
     transfer_button.grid(row=0, column=3, padx=10, pady=10)
     
     transaction_history_button = customtkinter.CTkButton(actions_frame, text="[TRANSACTION HISTORY]")
