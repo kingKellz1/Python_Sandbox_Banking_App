@@ -1,12 +1,14 @@
 import os
-import utils
+from . import utils
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TRANSACTIONS_DIR = os.path.join(BASE_DIR, "transactions")
 DATES_PER_PAGE = 10
 MAIN_MENU_OPTION = "M"
 
 def get_transaction_dates(user):
     """Return a list of dates for which transaction files exist for the user."""
-    transaction_dir = f"transactions/{user['UserID']}"
+    transaction_dir = os.path.join(TRANSACTIONS_DIR, user["UserID"])
     if not os.path.exists(transaction_dir):
         return []
     dates = []
@@ -63,6 +65,39 @@ def display_transaction_dates(user):
                     input("Invalid option. Press enter to try again")
             except ValueError:
                 input("Invalid option. Press enter to try again")
+                
+def get_transactions(user, transaction_date):
+    """Return the transactions for a specific date."""
+    transaction_file = os.path.join(TRANSACTIONS_DIR, user["UserID"], f"{transaction_date}.txt")
+    
+    if not os.path.exists(transaction_file):
+        return False, "No transaction history available"
+    
+    with open (transaction_file, "r", encoding="utf-8") as file:
+        content = file.read()
+        
+    if not content.strip():
+        return False, "No transactions recorded"
+    
+    transaction_blocks = content.split("=" * 60)
+    
+    transactions = []
+    
+    for block in transaction_blocks:
+        if not block.strip():
+            continue
+        
+        transaction = {}
+        
+        for line in block.strip().splitlines():
+            if ":" in line:
+                key, value = line.split(":", 1)
+                transaction[key.strip()] = value.strip()
+        if transaction:
+            transactions.append(transaction)
+    
+    return True, transactions
+
 def view_transactions(user, transaction_date):
     """Display the transactions for a specific date."""
     transaction_file = f"transactions/{user['UserID']}/{transaction_date}.txt"       #Path to the transaction file for the given date

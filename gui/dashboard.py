@@ -1,6 +1,7 @@
 import customtkinter
 from .. import transactions
 from .. import transfer
+from .. import transaction_history
 
 def go_back(account_frame, dashboard_frame):
     account_frame.grid_remove()
@@ -286,6 +287,98 @@ def show_transfer(app, user, dashboard_frame, checking_balance, savings_balance)
     back_button = customtkinter.CTkButton(transfer_frame, text="[ BACK TO DASHBOARD ]", command=lambda: go_back(transfer_frame, dashboard_frame))
     back_button.grid(row=6, column=0, columnspan=2, pady=20)
 
+def show_transaction_history(app, user, dashboard_frame):
+    dashboard_frame.grid_remove()
+    
+    history_frame = customtkinter.CTkFrame(app)
+    history_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    
+    history_frame.grid_columnconfigure(0, weight=1)
+    
+    title = customtkinter.CTkLabel(history_frame, text="TRANSACTION HISTORY", font=("Arial", 24, "bold"))
+    title.grid(row=0, column=0, pady=20)
+    
+    dates = transaction_history.get_transaction_dates(user)
+    if not dates:
+        no_history_label = customtkinter.CTkLabel(history_frame, text="No transaction history available.")
+        no_history_label.grid(row=1, column=0, pady=20)
+
+    dates_frame = customtkinter.CTkFrame(history_frame)
+    dates_frame.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
+    
+    def open_transaction_date(transaction_date):
+        success, result = transaction_history.get_transactions(user, transaction_date)
+        if not success:
+            return
+        
+        history_frame.grid_remove()
+        
+        details_frame = customtkinter.CTkFrame(app)
+        details_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        details_frame.tkraise()
+        
+        details_title = customtkinter.CTkLabel(details_frame, text=f"TRANSACTIONS FOR {transaction_date}", font=("Arial", 24, "bold"))
+        details_title.pack(pady=20)
+        
+        transactions_frame = customtkinter.CTkScrollableFrame(details_frame, width=650, height=350)
+        transactions_frame.pack(padx=20, pady=10, fill="both", expand=True)
+        
+        def toggle_transaction_details(details_frame):
+            if details_frame.winfo_ismapped():
+                details_frame.grid_remove()
+            else:
+                details_frame.grid()
+        
+        for transaction in result:
+            transaction_card = customtkinter.CTkFrame(transactions_frame)
+            transaction_card.pack(padx=10, pady=10, fill="x")
+            
+            transaction_type = transaction["Transaction Type"]
+            amount = float(transaction["Amount"])
+            
+            type_label = customtkinter.CTkLabel(transaction_card, text=transaction_type.upper(), font=("Arial", 16, "bold"))
+            type_label.grid(row=0, column=0, padx=15, pady=(12, 5), sticky="w")
+            
+            amount_label = customtkinter.CTkLabel(transaction_card, text=f"${amount:,.2f}", font=("Arial", 16, "bold"))
+            amount_label.grid(row=0, column=1, padx=15, pady=(12, 5), sticky="e")
+            
+            description_label = customtkinter.CTkLabel(transaction_card, text=transaction["Description"], font=("Arial", 12))
+            description_label.grid(row=1, column=0, columnspan=2, padx=15, pady=(0, 8), sticky="w")
+            
+            details_info_frame = customtkinter.CTkFrame(transaction_card, fg_color="transparent")
+            details_info_frame.grid(row=2, column=0, columnspan=2, padx=15, pady=(0, 10), sticky="ew")
+            
+            time_label = customtkinter.CTkLabel(details_info_frame, text=f"Time: {transaction['Time']}", font=("Arial", 11))
+            time_label.pack(side="left")
+            
+            transaction_id_label = customtkinter.CTkLabel(details_info_frame, text=f"Transaction #{transaction['Transaction ID']}", font=("Arial", 11))
+            transaction_id_label.pack(side="right")
+            
+            details_info_frame.grid_remove()
+            
+            type_label.bind("<Button-1>", lambda event, frame=details_info_frame: toggle_transaction_details(frame))
+            
+            amount_label.bind("<Button-1>", lambda event, frame=details_info_frame: toggle_transaction_details(frame))
+            
+            description_label.bind("<Button-1>", lambda event, frame=details_info_frame: toggle_transaction_details(frame))
+            
+            transaction_card.grid_columnconfigure(0, weight=1)
+            transaction_card.grid_columnconfigure(1, weight=1)
+        
+        back_history_button = customtkinter.CTkButton(details_frame, text="[ BACK TO HISTORY ]", command=lambda: go_back(details_frame, history_frame))
+        back_history_button.pack(pady=20)
+        
+        details_frame.update_idletasks()
+    
+    for index, transaction_date in enumerate(dates):
+        date_button = customtkinter.CTkButton(dates_frame, text=transaction_date, command=lambda date=transaction_date: open_transaction_date(date))
+        date_button.grid(row=index, column=0, padx=10, pady=5, sticky="ew")
+    
+    dates_frame.grid_columnconfigure(0, weight=1)
+    
+    back_button = customtkinter.CTkButton(history_frame, text="[ BACK TO DASHBOARD ]", command=lambda: go_back(history_frame, dashboard_frame))
+    back_button.grid(row=3, column=0, pady=20)
+
 def view_account(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
     account_frame = customtkinter.CTkFrame(app)
@@ -400,7 +493,7 @@ def show_dashboard(app, user):
     transfer_button = customtkinter.CTkButton(actions_frame, text="[TRANSFER]", command=lambda: show_transfer(app, user, dashboard_frame, checking_balance, savings_balance))
     transfer_button.grid(row=0, column=3, padx=10, pady=10)
     
-    transaction_history_button = customtkinter.CTkButton(actions_frame, text="[TRANSACTION HISTORY]")
+    transaction_history_button = customtkinter.CTkButton(actions_frame, text="[TRANSACTION HISTORY]", command=lambda: show_transaction_history(app, user, dashboard_frame))
     transaction_history_button.grid(row=1, column=1, padx=10, pady=10)
     
     logout_button = customtkinter.CTkButton(actions_frame, text="[LOGOUT]")
