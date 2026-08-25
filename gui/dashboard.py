@@ -439,10 +439,15 @@ def view_account(app, user, dashboard_frame):
     back_button = customtkinter.CTkButton(account_frame, text="[BACK TO DASHBOARD]", command=lambda: go_back(account_frame, dashboard_frame))
     back_button.grid(row=3, column=0, pady=20)
 
-def show_dashboard(app, user):
+def show_dashboard(app, user, login_frame):
     """Display the user's dashboard"""
     dashboard_frame = customtkinter.CTkFrame(app)
     dashboard_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    
+    def logout():
+        dashboard_frame.destroy()
+        login_frame.grid()
+        login_frame.update_idletasks()
     
     title = customtkinter.CTkLabel(dashboard_frame, text="BANK DASHBOARD", font=("Arial", 24, "bold"))
     title.pack(pady=30)
@@ -496,5 +501,5 @@ def show_dashboard(app, user):
     transaction_history_button = customtkinter.CTkButton(actions_frame, text="[TRANSACTION HISTORY]", command=lambda: show_transaction_history(app, user, dashboard_frame))
     transaction_history_button.grid(row=1, column=1, padx=10, pady=10)
     
-    logout_button = customtkinter.CTkButton(actions_frame, text="[LOGOUT]")
+    logout_button = customtkinter.CTkButton(actions_frame, text="[LOGOUT]", command=logout)
     logout_button.grid(row=1, column=2, padx=10, pady=10)

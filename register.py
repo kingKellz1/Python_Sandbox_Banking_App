@@ -3,9 +3,91 @@ import pwinput
 import random
 import os
 import re
-import utils
+from . import utils
 
-os.makedirs("users", exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+USERS_DIR = os.path.join(BASE_DIR, "users")
+
+os.makedirs(USERS_DIR, exist_ok=True)
+
+def create_account(fname, lname, email, username, password, confirm):
+    fname = fname.strip().capitalize()
+    lname = lname.strip().capitalize()
+    
+    if not fname:
+        return False, "First name cannot be blank"
+    
+    if not lname:
+        return False, "Last name cannot be blank"
+    
+    email = email.strip()
+    
+    if not email:
+        return False, "Email cannot be blank"
+    
+    if not (
+		email.count("@") == 1
+		and "." in email.split("@")[1]
+		and " " not in email
+	):
+        return False, "Invalid email address"
+    
+    username = username.strip().lower()
+    
+    if not username:
+        return False, "Username cannot be blank"
+    
+    if not any(char.isdigit() for char in username):
+        return False, "Username must contain at least one number"
+    
+    for filename in os.listdir(USERS_DIR):
+        if filename.startswith("."):
+            continue
+        filepath = os.path.join(USERS_DIR, filename)
+        with open(filepath, "r", encoding="utf-8", errors="ignore") as file:
+            for line in file:
+                if line.strip() == f"Username: {username}":
+                    return False, "Username already exists"
+    
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    if not re.search(r"[A-Z]", password):
+        return False, "Password must contain an uppercase letter"
+    if not re.search(r"[a-z]", password):
+        return False, "Password must contain a lowercase letter"
+    if not re.search(r"\d", password):
+        return False, "Password must contain a number"
+    if not re.search(r"[!@#$%^&*()_+=_]", password):
+        return False, "Password must contain special characters"
+    if " " in password:
+        return False, "Password cannot contain spaces"
+    if password != confirm:
+        return False, "Passwords do not match"
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    
+    while True:
+        userid = str(random.randint(100000, 999999))
+        filepath = os.path.join(USERS_DIR, f"{userid}.txt")
+        if not os.path.exists(filepath):
+            break
+        
+    user = {
+		"UserID": userid,
+        "First name": fname,
+        "Last name": lname,
+        "Email": email,
+        "Username": username,
+        "PasswordHash": hashed_password,
+        "CheckingBalance": 0.00,
+        "SavingsBalance": 0.00
+	}
+    
+    filepath = os.path.join(USERS_DIR, f"{userid}.txt")
+    with open(filepath, "w", encoding="utf-8") as profile:
+        for key, value in user.items():
+            profile.write(f"{key}: {value}\n")
+            
+    return True, user
 
 def register():
 	"""Prompts the user for their information to create an account"""
