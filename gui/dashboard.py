@@ -2,6 +2,7 @@ import customtkinter
 from .. import transactions
 from .. import transfer
 from .. import transaction_history
+from . import theme
 
 def go_back(account_frame, dashboard_frame):
     account_frame.grid_remove()
@@ -441,65 +442,69 @@ def view_account(app, user, dashboard_frame):
 
 def show_dashboard(app, user, login_frame):
     """Display the user's dashboard"""
-    dashboard_frame = customtkinter.CTkFrame(app)
-    dashboard_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    dashboard_frame = customtkinter.CTkFrame(app, fg_color=theme.PANEL_BG, corner_radius=theme.FRAME_RADIUS, border_width=1, border_color=theme.BORDER)
+    dashboard_frame.grid(row=0, column=0, columnspan=2, padx=40, pady=40, sticky="nsew")
     
     def logout():
         dashboard_frame.destroy()
         login_frame.grid()
         login_frame.update_idletasks()
     
-    title = customtkinter.CTkLabel(dashboard_frame, text="BANK DASHBOARD", font=("Arial", 24, "bold"))
-    title.pack(pady=30)
+    title = customtkinter.CTkLabel(dashboard_frame, text="BANK DASHBOARD", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    title.pack(pady=(30, 5))
     
-    welcome = customtkinter.CTkLabel(dashboard_frame, text=f"Welcome back, {user['First name']}!", font=("Arial", 16))
-    welcome.pack(pady=10)
+    welcome = customtkinter.CTkLabel(dashboard_frame, text=f"Welcome back, {user['First name']}!", font=("Arial", 14), text_color=theme.TEXT_MUTED)
+    welcome.pack(pady=(0, 20))
     
-    accounts_frame = customtkinter.CTkFrame(dashboard_frame)
-    accounts_frame.pack(pady=10, padx=20, fill="x")
+    accounts_frame = customtkinter.CTkFrame(dashboard_frame, fg_color="transparent")
+    accounts_frame.pack(pady=(10, 5), padx=30, fill="x")
     
-    actions_frame = customtkinter.CTkFrame(dashboard_frame)
-    actions_frame.pack(pady=20, padx=20, fill="x")
+    actions_frame = customtkinter.CTkFrame(dashboard_frame, fg_color="transparent")
+    actions_frame.pack(pady=(5, 10), padx=30, fill="x")
     
-    actions_frame.grid_columnconfigure(0, weight=1)
-    actions_frame.grid_columnconfigure(1, weight=1)
-    actions_frame.grid_columnconfigure(2, weight=1)
-    actions_frame.grid_columnconfigure(3, weight=1)
+    for column in range(6):
+        actions_frame.grid_columnconfigure(column, weight=1)
     
-    checking_frame = customtkinter.CTkFrame(accounts_frame)
-    checking_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+    checking_frame = customtkinter.CTkFrame(accounts_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    checking_frame.grid(row=0, column=0, padx=(0, 10), pady=10, sticky="nsew")
     accounts_frame.grid_columnconfigure(0, weight=1)
     
-    checking_title = customtkinter.CTkLabel(checking_frame, text="CHECKING", font=("Arial", 16, "bold"))
-    checking_title.pack(pady=(15, 5))
+    checking_title = customtkinter.CTkLabel(checking_frame, text="CHECKING", font=("Arial", 13, "bold"), text_color=theme.TEXT_MUTED)
+    checking_title.pack(pady=(20, 5))
     
-    checking_balance = customtkinter.CTkLabel(checking_frame, text=f"${user['CheckingBalance']:,.2f}", font=("Arial", 16, "bold"))
-    checking_balance.pack(pady=(5, 15))
+    checking_balance = customtkinter.CTkLabel(checking_frame, text=f"${user['CheckingBalance']:,.2f}", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    checking_balance.pack(pady=(5, 20))
     
-    savings_frame = customtkinter.CTkFrame(accounts_frame)
-    savings_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+    savings_frame = customtkinter.CTkFrame(accounts_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    savings_frame.grid(row=0, column=1, padx=(10, 0), pady=10, sticky="nsew")
     accounts_frame.grid_columnconfigure(1, weight=1)
     
-    savings_title = customtkinter.CTkLabel(savings_frame, text="SAVINGS", font=("Arial", 16, "bold"))
-    savings_title.pack(pady=(15, 5))
+    savings_title = customtkinter.CTkLabel(savings_frame, text="SAVINGS", font=("Arial", 13, "bold"), text_color=theme.TEXT_MUTED)
+    savings_title.pack(pady=(20, 5))
     
-    savings_balance = customtkinter.CTkLabel(savings_frame, text=f"${user['SavingsBalance']:,.2f}", font=("Arial", 16, "bold"))
-    savings_balance.pack(pady=(5, 15))
+    savings_balance = customtkinter.CTkLabel(savings_frame, text=f"${user['SavingsBalance']:,.2f}", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    savings_balance.pack(pady=(5, 20))
     
-    view_account_button = customtkinter.CTkButton(actions_frame, text="[VIEW ACCOUNT]", command=lambda: view_account(app, user, dashboard_frame))
-    view_account_button.grid(row=0, column=0, padx=10, pady=10)
+    actions_title = customtkinter.CTkLabel(actions_frame, text="QUICK ACTIONS", font=("Arial", 13, "bold"), text_color=theme.TEXT_MUTED)
+    actions_title.grid(row=0, column=0, columnspan=6, pady=(0, 10))
     
-    deposit_button = customtkinter.CTkButton(actions_frame, text="[DEPOSIT]", command=lambda: show_deposit(app, user, dashboard_frame, checking_balance, savings_balance))
-    deposit_button.grid(row=0, column=1, padx=10, pady=10)
+    view_account_button = customtkinter.CTkButton(actions_frame, text="VIEW ACCOUNT", command=lambda: view_account(app, user, dashboard_frame), height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.BORDER, text_color=theme.TEXT_SECONDARY, font=("Arial", 12, "bold"))
+    view_account_button.grid(row=2, column=0, columnspan=3, padx=(0, 6), pady=6, sticky="ew")
     
-    withdraw_button = customtkinter.CTkButton(actions_frame, text="[WITHDRAW]", command=lambda: show_withdraw(app, user, dashboard_frame, checking_balance, savings_balance))
-    withdraw_button.grid(row=0, column=2, padx=10, pady=10)
+    deposit_button = customtkinter.CTkButton(actions_frame, text="DEPOSIT", command=lambda: show_deposit(app, user, dashboard_frame, checking_balance, savings_balance), height=44, corner_radius=theme.BUTTON_RADIUS, fg_color=theme.PRIMARY, hover_color=theme.PRIMARY_HOVER, text_color=theme.TEXT_PRIMARY, font=("Arial", 13, "bold"))
+    deposit_button.grid(row=1, column=0, columnspan=2, padx=(0, 6), pady=6, sticky="ew")
     
-    transfer_button = customtkinter.CTkButton(actions_frame, text="[TRANSFER]", command=lambda: show_transfer(app, user, dashboard_frame, checking_balance, savings_balance))
-    transfer_button.grid(row=0, column=3, padx=10, pady=10)
+    withdraw_button = customtkinter.CTkButton(actions_frame, text="WITHDRAW", command=lambda: show_withdraw(app, user, dashboard_frame, checking_balance, savings_balance), height=44, corner_radius=theme.BUTTON_RADIUS, fg_color=theme.PRIMARY, hover_color=theme.PRIMARY_HOVER, text_color=theme.TEXT_PRIMARY, font=("Arial", 13, "bold"))
+    withdraw_button.grid(row=1, column=2, columnspan=2, padx=6, pady=6, sticky="ew")
     
-    transaction_history_button = customtkinter.CTkButton(actions_frame, text="[TRANSACTION HISTORY]", command=lambda: show_transaction_history(app, user, dashboard_frame))
-    transaction_history_button.grid(row=1, column=1, padx=10, pady=10)
+    transfer_button = customtkinter.CTkButton(actions_frame, text="TRANSFER", command=lambda: show_transfer(app, user, dashboard_frame, checking_balance, savings_balance), height=44, corner_radius=theme.BUTTON_RADIUS, fg_color=theme.PRIMARY, hover_color=theme.PRIMARY_HOVER, text_color=theme.TEXT_PRIMARY, font=("Arial", 13, "bold"))
+    transfer_button.grid(row=1, column=4, columnspan=2, padx=(6, 0), pady=6, sticky="ew")
     
-    logout_button = customtkinter.CTkButton(actions_frame, text="[LOGOUT]", command=logout)
-    logout_button.grid(row=1, column=2, padx=10, pady=10)
+    transaction_history_button = customtkinter.CTkButton(actions_frame, text="TRANSACTION HISTORY", command=lambda: show_transaction_history(app, user, dashboard_frame), height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.BORDER, text_color=theme.TEXT_SECONDARY, font=("Arial", 12, "bold"))
+    transaction_history_button.grid(row=2, column=3, columnspan=3, padx=(6, 0), pady=6, sticky="ew")
+    
+    logout_frame = customtkinter.CTkFrame(actions_frame, fg_color="transparent")
+    logout_frame.grid(row=3, column=0, columnspan=6, pady=(15, 5), sticky="ew")
+    
+    logout_button = customtkinter.CTkButton(logout_frame, text="LOGOUT", command=logout, width=180, height=40, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.DANGER, border_width=1, border_color=theme.DANGER, text_color=theme.DANGER, font=("Arial", 12, "bold"))
+    logout_button.pack()
