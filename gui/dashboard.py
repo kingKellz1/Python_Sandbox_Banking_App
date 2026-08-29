@@ -377,21 +377,28 @@ def show_transfer(app, user, dashboard_frame, checking_balance, savings_balance)
 def show_transaction_history(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
     
-    history_frame = customtkinter.CTkFrame(app)
-    history_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
-    
+    history_frame = customtkinter.CTkFrame(app, fg_color=theme.PANEL_BG, corner_radius=theme.FRAME_RADIUS, border_width=1, border_color=theme.BORDER)
+    history_frame.grid(row=0, column=0, columnspan=2, padx=40, pady=40, sticky="nsew")
     history_frame.grid_columnconfigure(0, weight=1)
+    history_frame.grid_rowconfigure(2, weight=1)
     
-    title = customtkinter.CTkLabel(history_frame, text="TRANSACTION HISTORY", font=("Arial", 24, "bold"))
-    title.grid(row=0, column=0, pady=20)
+    title = customtkinter.CTkLabel(history_frame, text="TRANSACTION HISTORY", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    title.grid(row=0, column=0, pady=(30, 5))
+    
+    subtitle = customtkinter.CTkLabel(history_frame, text="Review your account activity", font=("Arial", 13), text_color=theme.TEXT_MUTED)
+    subtitle.grid(row=1, column=0, pady=(0, 25))
     
     dates = transaction_history.get_transaction_dates(user)
     if not dates:
-        no_history_label = customtkinter.CTkLabel(history_frame, text="No transaction history available.")
-        no_history_label.grid(row=1, column=0, pady=20)
-
-    dates_frame = customtkinter.CTkFrame(history_frame)
-    dates_frame.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
+        no_history_label = customtkinter.CTkLabel(history_frame, text="No transaction history available.", font=("Arial", 13), text_color=theme.TEXT_MUTED)
+        no_history_label.grid(row=2, column=0, pady=20)
+    else:
+        dates_frame = customtkinter.CTkScrollableFrame(history_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=430)
+        dates_frame.grid(row=2, column=0, padx=40, pady=(10, 10), sticky="nsew")
+        dates_frame.grid_columnconfigure(0, weight=1)
+    
+        dates_title = customtkinter.CTkLabel(dates_frame, text="SELECT A DATE", font=("Arial", 14, "bold"), text_color=theme.TEXT_MUTED)
+        dates_title.grid(row=0, column=0, pady=(20, 15))
     
     def open_transaction_date(transaction_date):
         success, result = transaction_history.get_transactions(user, transaction_date)
@@ -400,15 +407,18 @@ def show_transaction_history(app, user, dashboard_frame):
         
         history_frame.grid_remove()
         
-        details_frame = customtkinter.CTkFrame(app)
-        details_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        details_frame = customtkinter.CTkFrame(app, fg_color=theme.PANEL_BG, corner_radius=theme.FRAME_RADIUS, border_width=1, border_color=theme.BORDER)
+        details_frame.grid(row=0, column=0, columnspan=2, padx=40, pady=40, sticky="nsew")
         details_frame.tkraise()
         
-        details_title = customtkinter.CTkLabel(details_frame, text=f"TRANSACTIONS FOR {transaction_date}", font=("Arial", 24, "bold"))
-        details_title.pack(pady=20)
+        details_title = customtkinter.CTkLabel(details_frame, text=f"TRANSACTION DETAILS", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+        details_title.pack(pady=(30, 5))
         
-        transactions_frame = customtkinter.CTkScrollableFrame(details_frame, width=650, height=350)
-        transactions_frame.pack(padx=20, pady=10, fill="both", expand=True)
+        details_date = customtkinter.CTkLabel(details_frame, text=transaction_date, font=("Arial", 13), text_color=theme.TEXT_MUTED)
+        details_date.pack(pady=(0, 20))
+        
+        transactions_frame = customtkinter.CTkScrollableFrame(details_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=430)
+        transactions_frame.pack(padx=40, pady=(10, 10), fill="both", expand=True)
         
         def toggle_transaction_details(details_frame):
             if details_frame.winfo_ismapped():
@@ -417,28 +427,28 @@ def show_transaction_history(app, user, dashboard_frame):
                 details_frame.grid()
         
         for transaction in result:
-            transaction_card = customtkinter.CTkFrame(transactions_frame)
-            transaction_card.pack(padx=10, pady=10, fill="x")
+            transaction_card = customtkinter.CTkFrame(transactions_frame, fg_color=theme.PANEL_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+            transaction_card.pack(padx=10, pady=8, fill="x")
             
             transaction_type = transaction["Transaction Type"]
             amount = float(transaction["Amount"])
             
-            type_label = customtkinter.CTkLabel(transaction_card, text=transaction_type.upper(), font=("Arial", 16, "bold"))
-            type_label.grid(row=0, column=0, padx=15, pady=(12, 5), sticky="w")
+            type_label = customtkinter.CTkLabel(transaction_card, text=transaction_type.upper(), font=("Arial", 14, "bold"), text_color=theme.TEXT_PRIMARY, cursor="hand2")
+            type_label.grid(row=0, column=0, padx=20, pady=(16, 5), sticky="w")
             
-            amount_label = customtkinter.CTkLabel(transaction_card, text=f"${amount:,.2f}", font=("Arial", 16, "bold"))
-            amount_label.grid(row=0, column=1, padx=15, pady=(12, 5), sticky="e")
+            amount_label = customtkinter.CTkLabel(transaction_card, text=f"${amount:,.2f}", font=("Arial", 16, "bold"), text_color=theme.TEXT_PRIMARY, cursor="hand2")
+            amount_label.grid(row=0, column=1, padx=20, pady=(16, 5), sticky="e")
             
-            description_label = customtkinter.CTkLabel(transaction_card, text=transaction["Description"], font=("Arial", 12))
-            description_label.grid(row=1, column=0, columnspan=2, padx=15, pady=(0, 8), sticky="w")
+            description_label = customtkinter.CTkLabel(transaction_card, text=transaction["Description"], font=("Arial", 12), text_color=theme.TEXT_SECONDARY, cursor="hand2")
+            description_label.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 12), sticky="w")
             
             details_info_frame = customtkinter.CTkFrame(transaction_card, fg_color="transparent")
-            details_info_frame.grid(row=2, column=0, columnspan=2, padx=15, pady=(0, 10), sticky="ew")
+            details_info_frame.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 15), sticky="ew")
             
-            time_label = customtkinter.CTkLabel(details_info_frame, text=f"Time: {transaction['Time']}", font=("Arial", 11))
+            time_label = customtkinter.CTkLabel(details_info_frame, text=f"Time: {transaction['Time']}", font=("Arial", 11), text_color=theme.TEXT_MUTED)
             time_label.pack(side="left")
             
-            transaction_id_label = customtkinter.CTkLabel(details_info_frame, text=f"Transaction #{transaction['Transaction ID']}", font=("Arial", 11))
+            transaction_id_label = customtkinter.CTkLabel(details_info_frame, text=f"Transaction #{transaction['Transaction ID']}", font=("Arial", 11), text_color=theme.TEXT_MUTED)
             transaction_id_label.pack(side="right")
             
             details_info_frame.grid_remove()
@@ -452,19 +462,19 @@ def show_transaction_history(app, user, dashboard_frame):
             transaction_card.grid_columnconfigure(0, weight=1)
             transaction_card.grid_columnconfigure(1, weight=1)
         
-        back_history_button = customtkinter.CTkButton(details_frame, text="[ BACK TO HISTORY ]", command=lambda: go_back(details_frame, history_frame))
-        back_history_button.pack(pady=20)
+        back_history_button = customtkinter.CTkButton(details_frame, text="BACK TO HISTORY", command=lambda: go_back(details_frame, history_frame), width=220, height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.PRIMARY, text_color=theme.PRIMARY, font=("Arial", 12, "bold"))
+        back_history_button.pack(pady=(10, 30))
         
         details_frame.update_idletasks()
+    if dates:
+        for index, transaction_date in enumerate(dates):
+            date_button = customtkinter.CTkButton(dates_frame, text=transaction_date, command=lambda date=transaction_date: open_transaction_date(date), height=42, corner_radius=theme.BUTTON_RADIUS, fg_color=theme.PANEL_BG, hover_color=theme.CARD_HOVER, border_width=1, border_color=theme.BORDER, text_color=theme.TEXT_PRIMARY, font=("Arial", 12, "bold"))
+            date_button.grid(row=index + 1, column=0, padx=20, pady=5, sticky="ew")
     
-    for index, transaction_date in enumerate(dates):
-        date_button = customtkinter.CTkButton(dates_frame, text=transaction_date, command=lambda date=transaction_date: open_transaction_date(date))
-        date_button.grid(row=index, column=0, padx=10, pady=5, sticky="ew")
+        dates_frame.grid_columnconfigure(0, weight=1)
     
-    dates_frame.grid_columnconfigure(0, weight=1)
-    
-    back_button = customtkinter.CTkButton(history_frame, text="[ BACK TO DASHBOARD ]", command=lambda: go_back(history_frame, dashboard_frame))
-    back_button.grid(row=3, column=0, pady=20)
+    back_button = customtkinter.CTkButton(history_frame, text="BACK TO DASHBOARD", command=lambda: go_back(history_frame, dashboard_frame), width=220, height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.PRIMARY, text_color=theme.PRIMARY, font=("Arial", 12, "bold"))
+    back_button.grid(row=3, column=0, pady=(15, 30))
 
 def view_account(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
