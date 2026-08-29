@@ -382,63 +382,113 @@ def show_transaction_history(app, user, dashboard_frame):
 
 def view_account(app, user, dashboard_frame):
     dashboard_frame.grid_remove()
-    account_frame = customtkinter.CTkFrame(app)
-    account_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    account_frame = customtkinter.CTkFrame(app, fg_color=theme.PANEL_BG, corner_radius=theme.FRAME_RADIUS, border_width=1, border_color=theme.BORDER)
+    account_frame.grid(row=0, column=0, columnspan=2, padx=40, pady=40, sticky="nsew")
     account_frame.grid_columnconfigure(0, weight=1)
     
-    title = customtkinter.CTkLabel(account_frame, text="ACCOUNT DETAILS", font=("Arial", 24, "bold"))
-    title.grid(row=0, column=0, columnspan=2, pady=20)
+    title = customtkinter.CTkLabel(account_frame, text="ACCOUNT DETAILS", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    title.grid(row=0, column=0, pady=(30, 5))
     
-    personal_frame = customtkinter.CTkFrame(account_frame)
-    personal_frame.grid(row=1, column=0, padx=40, pady=(10, 10), sticky="ew")
+    subtitle = customtkinter.CTkLabel(account_frame, text="Your personal and account information", font=("Arial", 13), text_color=theme.TEXT_MUTED)
+    subtitle.grid(row=1, column=0, pady=(0, 20))
     
-    balances_frame = customtkinter.CTkFrame(account_frame)
-    balances_frame.grid(row=2, column=0, padx=40, pady=(10, 10), sticky="ew")
+    personal_frame = customtkinter.CTkFrame(account_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    personal_frame.grid(row=2, column=0, padx=40, pady=(10, 10), sticky="ew")
     
-    balances_title = customtkinter.CTkLabel(balances_frame, text="ACCOUNT BALANCES", font=("Arial", 16, "bold"))
-    balances_title.grid(row=0, column=0, columnspan=2, padx=20, pady=(8, 3), sticky="w")
+    balances_frame = customtkinter.CTkFrame(account_frame, fg_color="transparent")
+    balances_frame.grid(row=3, column=0, padx=40, pady=(5, 10), sticky="ew")
     
-    personal_title = customtkinter.CTkLabel(personal_frame, text="PERSONAL INFORMATION", font=("Arial", 16, "bold"))
-    personal_title.grid(row=0, column=0, columnspan=2, padx=20, pady=(8, 3), sticky="w")
+    balances_frame.grid_columnconfigure(0, weight=1)
+    balances_frame.grid_columnconfigure(1, weight=1)
     
-    name_label = customtkinter.CTkLabel(personal_frame, text="Name:", font=("Arial", 12, "bold"))
-    name_label.grid(row=1, column=0, padx=(20, 10), pady=2, sticky="w")
+    balances_title = customtkinter.CTkLabel(balances_frame, text="ACCOUNT BALANCES", font=("Arial", 14, "bold"), text_color=theme.TEXT_MUTED)
+    balances_title.grid(row=0, column=0, columnspan=2, pady=(0, 10))
     
-    name_value = customtkinter.CTkLabel(personal_frame, text=f"{user['First name']} {user['Last name']}", font=("Arial", 12))
-    name_value.grid(row=1, column=1, padx=10, pady=2, sticky="w")
+    checking_card = customtkinter.CTkFrame(balances_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    checking_card.grid(row=1, column=0, padx=(0, 10), sticky="nsew")
     
-    username_label = customtkinter.CTkLabel(personal_frame, text="Username:", font=("Arial", 12, "bold"))
-    username_label.grid(row=2, column=0, padx=(20, 10), pady=2, sticky="w")
+    personal_title = customtkinter.CTkLabel(personal_frame, text="PERSONAL INFORMATION", font=("Arial", 14, "bold"), text_color=theme.TEXT_MUTED)
+    personal_title.grid(row=0, column=0, columnspan=2, pady=(20, 15))
+    
+    personal_frame.grid_columnconfigure(0, weight=1)
+    personal_frame.grid_columnconfigure(1, weight=1)
+    
+    personal_frame.grid_rowconfigure(1, weight=1)
+    personal_frame.grid_rowconfigure(2, weight=1)
+    
+    name_card = customtkinter.CTkFrame(personal_frame, fg_color=theme.PANEL_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=110)
+    name_card.grid(row=1, column=0, padx=(20, 10), pady=(5, 10), sticky="nsew")
+    name_card.grid_propagate(False)
+    
+    name_card.grid_rowconfigure(0, weight=1)
+    name_card.grid_rowconfigure(1, weight=1)
+    name_card.grid_columnconfigure(0, weight=1)
+    
+    name_label = customtkinter.CTkLabel(name_card, text="NAME", font=("Arial", 11, "bold"), text_color=theme.TEXT_MUTED)
+    name_label.grid(row=0, column=0, pady=(15, 5))
+    
+    name_value = customtkinter.CTkLabel(name_card, text=f"{user['First name']} {user['Last name']}", font=("Arial", 14, "bold"), text_color=theme.TEXT_PRIMARY)
+    name_value.grid(row=1, column=0, pady=(5, 15))
+    
+    username_card = customtkinter.CTkFrame(personal_frame, fg_color=theme.PANEL_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=110)
+    username_card.grid(row=1, column=1, padx=(10, 20), pady=(5, 10), sticky="nsew")
+    username_card.grid_propagate(False)
+    
+    username_card.grid_rowconfigure(0, weight=1)
+    username_card.grid_rowconfigure(1, weight=1)
+    username_card.grid_columnconfigure(0, weight=1)
+    
+    username_label = customtkinter.CTkLabel(username_card, text="USERNAME", font=("Arial", 11, "bold"), text_color=theme.TEXT_MUTED)
+    username_label.grid(row=0, column=0, pady=(15, 5))
 
-    username_value = customtkinter.CTkLabel(personal_frame, text=user["Username"], font=("Arial", 12))
-    username_value.grid(row=2, column=1, padx=10, pady=2, sticky="w")
+    username_value = customtkinter.CTkLabel(username_card, text=user["Username"], font=("Arial", 14, "bold"), text_color=theme.TEXT_PRIMARY)
+    username_value.grid(row=1, column=0, pady=(5, 15))
 
-    email_label = customtkinter.CTkLabel(personal_frame,text="Email:", font=("Arial", 12, "bold"))
-    email_label.grid(row=3, column=0, padx=(20, 10), pady=2, sticky="w")
-
-    email_value = customtkinter.CTkLabel(personal_frame, text=user["Email"], font=("Arial", 12))
-    email_value.grid(row=3, column=1, padx=10, pady=2, sticky="w")
-
-    user_id_label = customtkinter.CTkLabel(personal_frame, text="User ID:", font=("Arial", 12, "bold"))
-    user_id_label.grid(row=4, column=0, padx=(20, 10), pady=2, sticky="w")
-
-    user_id_value = customtkinter.CTkLabel(personal_frame, text=user["UserID"], font=("Arial", 12))
-    user_id_value.grid(row=4, column=1, padx=10, pady=2, sticky="w")
+    email_card = customtkinter.CTkFrame(personal_frame, fg_color=theme.PANEL_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=110)
+    email_card.grid(row=2, column=0, padx=(20, 10), pady=(10, 20), sticky="nsew")
+    email_card.grid_propagate(False)
     
-    checking_label = customtkinter.CTkLabel(balances_frame, text="Checking",font=("Arial", 12, "bold"))
-    checking_label.grid(row=1, column=0, padx=(20, 10), pady=2, sticky="w")
+    email_card.grid_rowconfigure(0, weight=1)
+    email_card.grid_rowconfigure(1, weight=1)
+    email_card.grid_columnconfigure(0, weight=1)
 
-    checking_value = customtkinter.CTkLabel(balances_frame, text=f"${user['CheckingBalance']:,.2f}", font=("Arial", 12))
-    checking_value.grid(row=1, column=1, padx=10, pady=2, sticky="w")
-
-    savings_label = customtkinter.CTkLabel(balances_frame,text="Savings", font=("Arial", 12, "bold"))
-    savings_label.grid(row=2, column=0, padx=(20, 10), pady=2, sticky="w")
-
-    savings_value = customtkinter.CTkLabel(balances_frame, text=f"${user['SavingsBalance']:,.2f}", font=("Arial", 12))
-    savings_value.grid(row=2, column=1, padx=10, pady=2, sticky="w")
+    email_label = customtkinter.CTkLabel(email_card,text="EMAIL", font=("Arial", 11, "bold"), text_color=theme.TEXT_MUTED)
+    email_label.grid(row=0, column=0, pady=(15, 5))
     
-    back_button = customtkinter.CTkButton(account_frame, text="[BACK TO DASHBOARD]", command=lambda: go_back(account_frame, dashboard_frame))
-    back_button.grid(row=3, column=0, pady=20)
+    email_value = customtkinter.CTkLabel(email_card, text=user["Email"], font=("Arial", 14, "bold"), text_color=theme.TEXT_PRIMARY)
+    email_value.grid(row=1, column=0, pady=(5, 15))
+    
+    user_id_card = customtkinter.CTkFrame(personal_frame, fg_color=theme.PANEL_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER, height=110)
+    user_id_card.grid(row=2, column=1, padx=(10, 20), pady=(10, 20), sticky="nsew")
+    user_id_card.grid_propagate(False)
+    
+    user_id_card.grid_rowconfigure(0, weight=1)
+    user_id_card.grid_rowconfigure(1, weight=1)
+    user_id_card.grid_columnconfigure(0, weight=1)
+
+    user_id_label = customtkinter.CTkLabel(user_id_card, text="USER ID", font=("Arial", 11, "bold"), text_color=theme.TEXT_MUTED)
+    user_id_label.grid(row=0, column=0, pady=(15, 5))
+
+    user_id_value = customtkinter.CTkLabel(user_id_card, text=user["UserID"], font=("Arial", 14, "bold"), text_color=theme.TEXT_PRIMARY)
+    user_id_value.grid(row=1, column=0, pady=(5, 15))
+    
+    checking_label = customtkinter.CTkLabel(checking_card, text="CHECKING",font=("Arial", 12, "bold"), text_color=theme.TEXT_MUTED)
+    checking_label.pack(pady=(20, 5))
+
+    checking_value = customtkinter.CTkLabel(checking_card, text=f"${user['CheckingBalance']:,.2f}", font=("Arial", 24, "bold"), text_color=theme.TEXT_PRIMARY)
+    checking_value.pack(pady=(5, 20))
+    
+    savings_card = customtkinter.CTkFrame(balances_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    savings_card.grid(row=1, column=1, padx=(10, 0), sticky="nsew")
+
+    savings_label = customtkinter.CTkLabel(savings_card,text="SAVINGS", font=("Arial", 12, "bold"), text_color=theme.TEXT_MUTED)
+    savings_label.pack(pady=(20, 5))
+
+    savings_value = customtkinter.CTkLabel(savings_card, text=f"${user['SavingsBalance']:,.2f}", font=("Arial", 24, "bold"), text_color=theme.TEXT_PRIMARY)
+    savings_value.pack(pady=(5, 20))
+    
+    back_button = customtkinter.CTkButton(account_frame, text="BACK TO DASHBOARD", command=lambda: go_back(account_frame, dashboard_frame), width=220, height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.PRIMARY, text_color=theme.PRIMARY, font=("Arial", 12, "bold"))
+    back_button.grid(row=4, column=0, pady=(15, 30))
 
 def show_dashboard(app, user, login_frame):
     """Display the user's dashboard"""
