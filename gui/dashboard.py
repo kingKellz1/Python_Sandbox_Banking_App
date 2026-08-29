@@ -20,12 +20,23 @@ def show_deposit(app, user, dashboard_frame, checking_balance, savings_balance):
         result_label.configure(text="")
         
         if account == "Checking":
-            checking_button.configure(fg_color="green")
-            savings_button.configure(fg_color="gray")
+            checking_button.configure(
+                fg_color=theme.PRIMARY,
+                text_color=theme.TEXT_PRIMARY
+            )
+            savings_button.configure(
+                fg_color="transparent",
+                text_color=theme.TEXT_SECONDARY
+            )
         else:
-            checking_button.configure(fg_color="gray")
-            savings_button.configure(fg_color="green")
-        
+            checking_button.configure(
+                fg_color="transparent",
+                text_color=theme.TEXT_SECONDARY
+            )
+            savings_button.configure(
+                fg_color=theme.PRIMARY,
+                text_color=theme.TEXT_PRIMARY
+            )
         amount_frame.grid()
     
     def make_deposit():
@@ -33,13 +44,13 @@ def show_deposit(app, user, dashboard_frame, checking_balance, savings_balance):
         try:
             amount = float(amount)
         except ValueError:
-            result_label.configure(text="Please enter a valid amount")
+            result_label.configure(text="Please enter a valid amount", text_color=theme.DANGER)
             return
         
         success, result = transactions.deposit(user, user_selection, amount)
         
         if success:
-            result_label.configure(text=f"Deposit successfull!\nNew balance: ${result:,.2f}")
+            result_label.configure(text=f"Deposit successful!\nNew balance: ${result:,.2f}", text_color=theme.SUCCESS)
             amount_entry.delete(0, "end")
             
             if user_selection == "Checking":
@@ -47,45 +58,55 @@ def show_deposit(app, user, dashboard_frame, checking_balance, savings_balance):
             else:
                 savings_balance.configure(text=f"${result:,.2f}")
         else:
-            result_label.configure(text=result)
+            result_label.configure(text=result, text_color=theme.DANGER)
     
-    deposit_frame = customtkinter.CTkFrame(app)
-    deposit_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+    deposit_frame = customtkinter.CTkFrame(app, fg_color=theme.PANEL_BG, corner_radius=theme.FRAME_RADIUS, border_width=1, border_color=theme.BORDER)
+    deposit_frame.grid(row=0, column=0, columnspan=2, padx=40, pady=40, sticky="nsew")
     
     deposit_frame.grid_columnconfigure(0, weight=1)
     deposit_frame.grid_columnconfigure(1, weight=1)
     
-    title = customtkinter.CTkLabel(deposit_frame, text="MAKE A DEPOSIT", font=("Arial", 24, "bold"))
-    title.grid(row=0, column=0, columnspan=2, pady=20)
+    title = customtkinter.CTkLabel(deposit_frame, text="MAKE A DEPOSIT", font=("Arial", 26, "bold"), text_color=theme.TEXT_PRIMARY)
+    title.grid(row=0, column=0, columnspan=2, pady=(30, 5))
     
-    account_label = customtkinter.CTkLabel(deposit_frame, text="SELECT ACCOUNT", font=("Arial", 16, "bold"))
-    account_label.grid(row=1, column=0, columnspan=2, pady=(20, 10))
+    subtitle = customtkinter.CTkLabel(deposit_frame, text="Add funds to one of your accounts", font=("Arial", 13), text_color=theme.TEXT_MUTED)
+    subtitle.grid(row=1, column=0, columnspan=2, pady=(0, 25))
     
-    checking_button = customtkinter.CTkButton(deposit_frame, text="[ CHECKING ]", command=lambda: select_account("Checking"))
-    checking_button.grid(row=2, column=0, padx=10, pady=10)
+    account_frame = customtkinter.CTkFrame(deposit_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    account_frame.grid(row=2, column=0, columnspan=2, padx=40, pady=(10, 10), sticky="ew")
     
-    savings_button = customtkinter.CTkButton(deposit_frame, text="[ SAVINGS ]", command=lambda: select_account("Savings"))
-    savings_button.grid(row=2, column=1, padx=10, pady=10)
+    account_frame.grid_columnconfigure(0, weight=1)
+    account_frame.grid_columnconfigure(1, weight=1)
     
-    amount_frame = customtkinter.CTkFrame(deposit_frame)
-    amount_frame.grid(row=4, column=0, columnspan=2, pady=10)
+    account_label = customtkinter.CTkLabel(account_frame, text="SELECT ACCOUNT", font=("Arial", 14, "bold"), text_color=theme.TEXT_MUTED)
+    account_label.grid(row=0, column=0, columnspan=2, pady=(20, 15))
     
-    amount_label = customtkinter.CTkLabel(amount_frame, text="AMOUNT")
-    amount_label.grid(row=0, column=0, padx=10, pady=10)
+    checking_button = customtkinter.CTkButton(account_frame, text="CHECKING", command=lambda: select_account("Checking"), height=44, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_HOVER, border_width=1, border_color=theme.BORDER, text_color=theme.TEXT_SECONDARY, font=("Arial", 12, "bold"))
+    checking_button.grid(row=1, column=0, padx=(20, 10), pady=(0, 20), sticky="ew")
     
-    amount_entry = customtkinter.CTkEntry(amount_frame, width=200)
-    amount_entry.grid(row=0, column=1, padx=10, pady=10)
+    savings_button = customtkinter.CTkButton(account_frame, text="SAVINGS", command=lambda: select_account("Savings"), height=44, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_HOVER, border_width=1, border_color=theme.BORDER, text_color=theme.TEXT_SECONDARY, font=("Arial", 12, "bold"))
+    savings_button.grid(row=1, column=1, padx=(10, 20), pady=(0, 20), sticky="ew")
+    
+    amount_frame = customtkinter.CTkFrame(deposit_frame, fg_color=theme.CARD_BG, corner_radius=theme.CARD_RADIUS, border_width=1, border_color=theme.BORDER)
+    amount_frame.grid(row=3, column=0, columnspan=2, padx=40, pady=10, sticky="ew")
+    amount_frame.grid_columnconfigure(0, weight=1)
+    
+    amount_label = customtkinter.CTkLabel(amount_frame, text="AMOUNT", font=("Arial", 14, "bold"), text_color=theme.TEXT_MUTED)
+    amount_label.grid(row=0, column=0, pady=(20, 10))
+    
+    amount_entry = customtkinter.CTkEntry(amount_frame, width=260, height=44, corner_radius=theme.ENTRY_RADIUS, fg_color=theme.PANEL_BG, border_color=theme.BORDER, text_color=theme.TEXT_PRIMARY, placeholder_text="$0.00", justify="center", font=("Arial", 14))
+    amount_entry.grid(row=1, column=0, pady=10)
     
     amount_frame.grid_remove()
     
-    deposit_button = customtkinter.CTkButton(amount_frame, text="[ DEPOSIT ]", command=make_deposit)
-    deposit_button.grid(row=0, column=2, padx=10, pady=10)
+    deposit_button = customtkinter.CTkButton(amount_frame, text="DEPOSIT", command=make_deposit, width=260, height=44, corner_radius=theme.BUTTON_RADIUS, fg_color=theme.PRIMARY, hover_color=theme.PRIMARY_HOVER, text_color=theme.TEXT_PRIMARY, font=("Arial", 13, "bold"))
+    deposit_button.grid(row=2, column=0, pady=(10, 20))
     
-    result_label = customtkinter.CTkLabel(deposit_frame, text="")
-    result_label.grid(row=5, column=0, columnspan=2, pady=5)
+    result_label = customtkinter.CTkLabel(deposit_frame, text="", font=("Arial", 13, "bold"), text_color=theme.TEXT_SECONDARY)
+    result_label.grid(row=4, column=0, columnspan=2, pady=(10, 5))
     
-    back_button = customtkinter.CTkButton(deposit_frame, text="[BACK TO DASHBOARD]", command=lambda: go_back(deposit_frame, dashboard_frame))
-    back_button.grid(row=6, column=0, columnspan=2, pady=20)
+    back_button = customtkinter.CTkButton(deposit_frame, text="BACK TO DASHBOARD", command=lambda: go_back(deposit_frame, dashboard_frame), width=220, height=42, corner_radius=theme.BUTTON_RADIUS, fg_color="transparent", hover_color=theme.CARD_BG, border_width=1, border_color=theme.PRIMARY, text_color=theme.PRIMARY, font=("Arial", 12, "bold"))
+    back_button.grid(row=5, column=0, columnspan=2, pady=(15, 30))
 
 def show_withdraw(app, user, dashboard_frame, checking_balance, savings_balance):
     dashboard_frame.grid_remove()
